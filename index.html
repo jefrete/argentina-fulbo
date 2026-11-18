@@ -7,666 +7,155 @@
   <title>Deportes Hoy - Horario Argentina</title>
   <meta name="description" content="Partidos, resultados y posiciones del día con horario de Argentina: Liga Profesional, copas, Europa, selecciones europeas y sudamericanas, y Los Pumas.">
 
+  <!-- Fuentes: Barlow Condensed (títulos y números) + Manrope (texto) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
+
+  <!-- Animate.css: entrada suave de las secciones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Barlow Condensed"', 'Impact', 'sans-serif'],
+            sans: ['Manrope', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
+          },
+          colors: {
+            ink: '#070d22',
+            panel: '#101a3d',
+            panel2: '#18265a',
+            line: '#26377a',
+            celeste: '#75aadb',
+            gold: '#f6b40e',
+            live: '#ff5d73'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide: íconos -->
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js" defer></script>
 
   <style>
-    /* ============ Variables ============ */
-    :root {
-      --ink: #070d22;
-      --panel: #101a3d;
-      --panel2: #18265a;
-      --line: #26377a;
-      --celeste: #75aadb;
-      --gold: #f6b40e;
-      --live: #ff5d73;
-      --white: #eef3ff;
-      --muted: #94a3b8;
-      --radius: 16px;
-      --shadow-live: 0 8px 24px -8px rgba(255, 93, 115, .35);
-      --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, .35);
-      --font-display: "Barlow Condensed", Impact, sans-serif;
-      --font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-      color-scheme: dark;
-    }
-
-    /* ============ Reset ============ */
-    *, *::before, *::after { box-sizing: border-box; }
-    html { background: var(--ink); scroll-behavior: smooth; }
+    html { background: #070d22; color-scheme: dark; scroll-behavior: smooth; }
     body {
-      margin: 0;
-      min-width: 280px;
-      min-height: 100vh;
-      background-color: var(--ink);
+      background-color: #070d22;
       background-image: radial-gradient(900px 420px at 50% -140px, rgba(27, 58, 122, .75), transparent);
       background-attachment: fixed;
-      color: var(--white);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      line-height: 1.5;
-    }
-    img { display: block; max-width: 100%; }
-    button { font: inherit; cursor: pointer; }
-    h1, h2, h3, h4 { margin: 0; }
-    p { margin: 0; }
-    :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-
-    /* ============ Utilidades ============ */
-    .wrap { width: 100%; max-width: 48rem; margin-inline: auto; padding-inline: 1rem; }
-    .hidden { display: none !important; }
-    .tabular { font-variant-numeric: tabular-nums; }
-
-    /* ============ Header ============ */
-    .site-header {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(to bottom, #16296a, #0d1745);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;  /* <-- space-around */
-      gap: .75rem;
-      padding: .5rem 1rem;
-      min-height: 88px;
-    }
-    .site-header::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image: radial-gradient(#fff 1px, transparent 1px);
-      background-size: 18px 18px;
-      opacity: .07;
-      pointer-events: none;
-    }
-    .site-header .accent-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 6px;
-      background: linear-gradient(to right, var(--celeste), #fff, var(--celeste));
-    }
-
-    /* Logo: SIN flex-grow, para que space-around funcione */
-    .brand-logo {
-      display: block;
-      height: 76px;
-      width: auto;
-      max-width: 100%;
-      flex: 0 0 auto;
-      object-fit: contain;
-      object-position: left center;
-    }
-
-    /* El reloj NUNCA se comprime */
-    .header-meta {
-      display: none;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: .25rem;
-      flex: 0 0 auto;
-    }
-
-    .header-clock {
-      display: flex; align-items: center; gap: .25rem;
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: .02em;
-      color: var(--celeste);
-      white-space: nowrap;
-    }
-    .header-clock svg { width: 1rem; height: 1rem; flex-shrink: 0; }
-    .header-link {
-      display: inline-flex; align-items: center; gap: .25rem;
-      font-size: .75rem; font-weight: 600;
-      color: #cbd5e1; text-decoration: none;
-      transition: color .15s;
-    }
-    .header-link:hover { color: #fff; }
-    .header-link svg { width: .875rem; height: .875rem; }
-
-    @media (min-width: 421px) {
-      .brand-logo { height: 110px; }
-    }
-    @media (min-width: 640px) {
-      .site-header { min-height: 120px; padding-block: .75rem; }
-      .header-meta { display: flex; }
-    }
-
-    /* ============ Nav filtros ============ */
-    .filters-nav {
-      position: sticky; top: 0; z-index: 30;
-      display: flex; gap: .5rem;
-      overflow-x: auto;
-      border-bottom: 1px solid var(--line);
-      background: rgba(7, 13, 34, .85);
-      backdrop-filter: blur(8px);
-      padding: .625rem 1rem;
-      scrollbar-width: none;
-    }
-    .filters-nav::-webkit-scrollbar { display: none; }
-
-    .filter-btn {
-      display: inline-flex; align-items: center; gap: .5rem;
-      flex-shrink: 0;
-      white-space: nowrap;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: .375rem .875rem .375rem .625rem;
-      font-size: .8125rem;
-      font-weight: 600;
-      color: var(--white);
-      background: var(--panel);
-      transition: border-color .15s, transform .15s, background .15s, color .15s;
-    }
-    .filter-btn:hover { border-color: var(--celeste); transform: translateY(-1px); }
-    .filter-btn.is-active {
-      background: linear-gradient(135deg, var(--celeste), #a9ccee);
-      color: var(--ink);
-      border-color: transparent;
-      box-shadow: 0 8px 20px -8px rgba(117, 170, 219, .6);
-    }
-    .filter-btn img, .filter-btn svg { width: 1rem; height: 1rem; flex-shrink: 0; }
-    .filter-btn img { width: 22px; height: 15px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
-
-    /* ============ Stats (solo desktop) ============ */
-    .stats-grid {
-      display: none;
-      grid-template-columns: repeat(4, 1fr);
-      gap: .375rem;
-      margin-bottom: .75rem;
-    }
-    @media (min-width: 640px) {
-      .stats-grid { display: grid; }
-    }
-    .stat-card {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      border-radius: 12px;
-      padding: .375rem .25rem;
-      text-align: center;
-    }
-    .stat-card svg { width: .875rem; height: .875rem; margin-inline: auto; }
-    .stat-card .num {
-      display: block;
-      margin-top: .125rem;
-      font-family: var(--font-display);
-      font-size: 1.375rem;
-      font-weight: 800;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-    .stat-card .label { font-size: .625rem; color: var(--muted); }
-    .stat-card.live .num { color: var(--live); }
-    .stat-card.finished .num { color: #cbd5e1; }
-
-    /* ============ Días ============ */
-    .days-row {
-      display: flex; gap: .5rem;
-      overflow-x: auto;
-      padding-bottom: .25rem;
-      margin-bottom: 1rem;
-      scrollbar-width: none;
-    }
-    .days-row::-webkit-scrollbar { display: none; }
-    .day-btn {
-      flex-shrink: 0;
-      min-width: 4.8rem;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--white);
-      padding: .375rem .75rem;
-      text-align: center;
-      line-height: 1.2;
-      transition: border-color .15s, background .15s;
-    }
-    .day-btn:hover { border-color: var(--celeste); }
-    .day-btn small { display: block; font-size: .6875rem; color: var(--muted); }
-    .day-btn strong { font-size: .8125rem; font-weight: 700; }
-    .day-btn.is-active { background: var(--gold); border-color: var(--gold); color: #1c1500; }
-    .day-btn.is-active small { color: rgba(28, 21, 0, .7); }
-
-    /* ============ Chips estado ============ */
-    .chips-wrap { display: flex; justify-content: center; margin-bottom: 1.5rem; }
-    .chips {
-      display: inline-flex;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      border-radius: 999px;
-      padding: 4px;
-      max-width: 100%;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .chips::-webkit-scrollbar { display: none; }
-    .chip {
-      border: none;
-      background: transparent;
-      border-radius: 999px;
-      padding: .375rem .875rem;
-      font-size: .75rem;
-      font-weight: 700;
-      color: #cbd5e1;
-      white-space: nowrap;
-      transition: background .15s, color .15s;
-    }
-    .chip:hover { color: #fff; }
-    .chip.is-active { background: var(--celeste); color: var(--ink); }
-
-    /* ============ Warning ============ */
-    .warning {
-      margin-bottom: 1rem;
-      border: 1px solid rgba(246, 180, 14, .5);
-      background: rgba(246, 180, 14, .1);
-      color: #fcd34d;
-      border-radius: 12px;
-      padding: .5rem .75rem;
-      font-size: .8125rem;
-    }
-
-    /* ============ Match rows ============ */
-    .comp-block { margin-bottom: 2.25rem; }
-    .section-title {
-      display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    @media (min-width: 640px) { .section-title { font-size: 1.5rem; } }
-    .section-title img { width: 22px; height: 15px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
-    .section-title .count { font-family: var(--font-sans); font-size: .875rem; font-weight: 600; color: var(--muted); }
-
-    .badge-live {
-      display: inline-flex; align-items: center; gap: .25rem;
-      border-radius: 999px;
-      background: rgba(255, 93, 115, .15);
-      padding: .125rem .5rem;
-      font-size: .6875rem;
-      font-weight: 700;
-      letter-spacing: .05em;
-      color: var(--live);
-    }
-    .badge-live::before {
-      content: ""; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--live);
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
-
-    .note {
-      margin-top: .5rem;
-      border: 1px dashed var(--line);
-      background: rgba(16, 26, 61, .5);
-      border-radius: 12px;
-      padding: .5rem .75rem;
-      font-size: .875rem;
-      color: var(--muted);
-    }
-
-    .matches-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .625rem; }
-
-    .match {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      border-radius: var(--radius);
-      padding: .625rem .75rem;
-      transition: border-color .15s, transform .15s;
-    }
-    .match:hover { border-color: var(--celeste); }
-    .match.is-live {
-      border-color: rgba(255, 93, 115, .7);
-      background: linear-gradient(to right, rgba(255, 93, 115, .15), var(--panel));
-      box-shadow: var(--shadow-live);
-    }
-    .match-meta {
-      display: flex; align-items: baseline; gap: .5rem;
-      margin-bottom: .5rem;
-    }
-    .match-time {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      line-height: 1;
-      color: #fff;
-      font-variant-numeric: tabular-nums;
-    }
-    .match.is-live .match-time { color: var(--live); }
-    .match-date-tag { font-size: .75rem; font-weight: 700; color: var(--gold); }
-    .match-venue {
-      margin-left: auto;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: .6875rem;
-      color: var(--muted);
-    }
-
-    .match-body {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: .5rem;
-    }
-    .team {
-      display: flex; align-items: center; gap: .5rem;
-      min-width: 0;
-      font-size: .8125rem;
-    }
-    @media (min-width: 640px) { .team { font-size: .875rem; } }
-    .team.away { justify-content: flex-end; text-align: right; }
-    .team .name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 600;
-      color: #e2e8f0;
-    }
-    .team.is-winner .name { font-weight: 800; color: #fff; }
-    .team img {
-      width: 28px; height: 28px;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-    @media (min-width: 640px) { .team img { width: 32px; height: 32px; } }
-
-    .score-box { min-width: 4.6rem; text-align: center; }
-    .score-vs {
-      font-size: .75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      color: var(--muted);
-    }
-    .score-line {
-      display: block;
-      font-family: var(--font-display);
-      font-size: 1.7rem;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: .02em;
-      color: #fff;
-      font-variant-numeric: tabular-nums;
-    }
-    .match.is-live .score-line { color: var(--live); }
-    .score-detail {
-      display: block;
-      margin-top: .25rem;
-      font-size: .6875rem;
-      color: var(--muted);
-    }
-    .match.is-live .score-detail { color: var(--live); font-weight: 700; }
-
-    /* ============ Resultados (últimos) ============ */
-    .results-block { margin-top: 1.5rem; border-top: 1px solid rgba(38, 55, 122, .6); padding-top: 1rem; }
-    .results-block h3 {
-      display: flex; align-items: center; gap: .5rem;
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: #cbd5e1;
-    }
-    .results-block h3 svg { width: 1rem; height: 1rem; flex-shrink: 0; color: var(--muted); }
-    .results-empty { padding-top: .5rem; font-size: .875rem; color: var(--muted); }
-
-    /* ============ Empty states ============ */
-    .empty-state {
-      padding: 3rem 1rem;
-      text-align: center;
-      color: var(--muted);
-    }
-    .empty-state strong { display: block; margin-bottom: .25rem; color: #e2e8f0; }
-
-    /* ============ Skeleton ============ */
-    .skeleton {
-      height: 4rem;
-      border-radius: var(--radius);
-      background: var(--panel);
-      margin-bottom: .5rem;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-
-    /* ============ Posiciones ============ */
-    .standings-section { margin-top: 1rem; }
-    .standings-header {
-      display: flex; align-items: center; gap: .625rem;
-      border-top: 1px solid var(--line);
-      padding-top: 2rem;
-      margin-bottom: 1rem;
-    }
-    .standings-header svg { width: 1.5rem; height: 1.5rem; color: var(--gold); }
-    .standings-header h2 {
-      font-family: var(--font-display);
-      font-size: 1.875rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-
-    .standings-card {
-      margin-bottom: 1rem;
-      border: 1px solid var(--line);
-      background: rgba(16, 26, 61, .6);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .standings-card summary {
-      display: flex; align-items: center; gap: .625rem;
-      padding: .75rem 1rem;
-      cursor: pointer;
-      list-style: none;
-    }
-    .standings-card summary::-webkit-details-marker { display: none; }
-    .standings-card summary img { width: 22px; height: 15px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
-    .standings-card summary .comp-name {
-      font-family: var(--font-display);
-      font-size: 1.125rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .standings-card summary .chev {
-      margin-left: auto;
-      color: var(--muted);
-      transition: transform .2s;
-    }
-    .standings-card summary .chev svg { width: 1.25rem; height: 1.25rem; }
-    .standings-card[open] summary .chev { transform: rotate(180deg); }
-    .standings-body { border-top: 1px solid rgba(38, 55, 122, .6); }
-    .standings-msg { padding: 1rem; font-size: .875rem; color: var(--muted); }
-
-    .standings-table-wrap { overflow-x: auto; }
-    .standings-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .875rem;
-      font-variant-numeric: tabular-nums;
-    }
-    .standings-table th {
-      padding: .5rem .375rem;
-      font-size: .6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-      text-align: center;
-    }
-    .standings-table th.col-team { text-align: left; padding-inline: .5rem; }
-    .standings-table th.col-rank { width: 2rem; }
-    .standings-table th.wide { display: none; }
-    @media (min-width: 640px) { .standings-table th.wide { display: table-cell; } }
-
-    .standings-table td {
-      padding: .5rem .375rem;
-      text-align: center;
-      color: #cbd5e1;
-      border-top: 1px solid rgba(38, 55, 122, .6);
-    }
-    .standings-table td.col-team {
-      width: 100%;
-      max-width: 0;
-      padding-inline: .5rem;
-      text-align: left;
-    }
-    .standings-table td.col-rank { font-size: .75rem; font-weight: 700; color: #cbd5e1; }
-    .standings-table td.wide { display: none; }
-    @media (min-width: 640px) { .standings-table td.wide { display: table-cell; } }
-    .standings-table td.strong { font-weight: 800; color: #fff; }
-    .standings-table tr:hover { background: rgba(24, 38, 90, .6); }
-    .standings-table .team-cell { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-    .standings-table .team-cell img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
-    .standings-table .team-cell span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-
-    .standings-legend {
-      display: flex; flex-wrap: wrap; gap: .25rem 1rem;
-      border-top: 1px solid rgba(38, 55, 122, .6);
-      padding: .5rem .75rem;
-      font-size: .6875rem;
-      color: var(--muted);
-      list-style: none;
+      color: #eef3ff;
       margin: 0;
     }
-    .standings-legend li { display: flex; align-items: center; gap: .375rem; }
-    .standings-legend .dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    .group-title {
-      background: rgba(24, 38, 90, .5);
-      padding: .375rem 1rem;
-      font-size: .75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #cbd5e1;
-    }
-
-    /* ============ Footer ============ */
-    .site-footer {
-      margin-top: 2.5rem;
-      text-align: center;
-      font-size: .75rem;
-      color: var(--muted);
-    }
-    .site-footer details { margin-top: .75rem; text-align: left; }
-    .site-footer summary { cursor: pointer; text-align: center; }
-    .site-footer ul { margin-top: .5rem; padding-left: 1.25rem; list-style: disc; }
-    .site-footer li { margin-bottom: .125rem; }
-    .site-footer li.error { color: #fca5a5; }
-
-    /* ============ Animaciones reduced-motion ============ */
-    @media (prefers-reduced-motion: reduce) {
-      .animate__animated { animation: none !important; }
-      html { scroll-behavior: auto; }
-    }
-
-    /* ============ Scroll snap móvil ============ */
-    @media (max-width: 420px) {
-      .filters-nav, .days-row { scroll-snap-type: x proximity; }
-      .filter-btn, .day-btn { scroll-snap-align: start; }
-    }
+    #filters, #days { scrollbar-width: none; }
+    #filters::-webkit-scrollbar, #days::-webkit-scrollbar { display: none; }
+    :focus-visible { outline: 2px solid #f6b40e; outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { .animate__animated { animation: none !important; } }
   </style>
 </head>
-<body>
+<body class="min-h-screen bg-ink font-sans text-slate-100 antialiased">
 
-  <header class="site-header">
-    <div class="accent-bar"></div>
-    <img src="logo.jpg" alt="Argentina Fulbo" class="brand-logo">
-    <div class="header-meta">
-      <div class="header-clock">
-        <i data-lucide="clock-3"></i><span id="clock"></span>
+  <header class="relative overflow-hidden border-b border-line bg-gradient-to-b from-[#16296a] to-[#0d1745]">
+    <div class="h-1.5 bg-gradient-to-r from-celeste via-white to-celeste"></div>
+    <div class="pointer-events-none absolute inset-0 opacity-[.07]" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 18px 18px;"></div>
+    <div class="relative flex flex-wrap items-center justify-around gap-x-4 gap-y-2 px-4 py-3">
+      <img src="logo.jpg" alt="Logo" class="h-8 w-auto max-w-none shrink-0 object-contain sm:h-10">
+      <div class="flex flex-col items-end">
+        <div class="flex items-center gap-1.5 whitespace-nowrap font-display text-lg font-bold tracking-wide text-celeste sm:text-xl">
+          <i data-lucide="clock-3" class="h-4 w-4 shrink-0"></i><span id="clock"></span>
+        </div>
+        <a href="#posiciones" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-300 hover:text-white">
+          Ver posiciones <i data-lucide="arrow-down" class="h-3.5 w-3.5"></i>
+        </a>
       </div>
-      <a href="#posiciones" class="header-link">
-        Ver posiciones <i data-lucide="arrow-down"></i>
-      </a>
     </div>
   </header>
 
-  <nav id="filters" class="filters-nav" aria-label="Competencias"></nav>
+  <nav id="filters" aria-label="Competencias"
+       class="sticky top-0 z-30 flex gap-2 overflow-x-auto border-b border-line bg-ink/85 px-4 py-2.5 backdrop-blur"></nav>
 
-  <main class="wrap" style="padding-top: 1.25rem; padding-bottom: 4rem;">
+  <main class="mx-auto max-w-3xl px-4 pb-16 pt-5">
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <i data-lucide="layers" style="color: var(--muted);"></i>
-        <strong id="statTotal" class="num">0</strong>
-        <span class="label">Total</span>
+    <!-- Stats: ocultas en mobile, visibles y más chicas en desktop, entre header y días -->
+    <div class="mb-3 hidden grid-cols-4 gap-1.5 sm:grid">
+      <div class="rounded-xl border border-line bg-panel px-1 py-1.5 text-center">
+        <i data-lucide="layers" class="mx-auto h-3 w-3 text-slate-400"></i>
+        <strong id="statTotal" class="mt-0.5 block font-display text-xl font-extrabold leading-none">0</strong>
+        <span class="text-[10px] text-slate-400">Total</span>
       </div>
-      <div class="stat-card live">
-        <i data-lucide="radio" style="color: var(--live);"></i>
-        <strong id="statLive" class="num">0</strong>
-        <span class="label">En vivo</span>
+      <div class="rounded-xl border border-line bg-panel px-1 py-1.5 text-center">
+        <i data-lucide="radio" class="mx-auto h-3 w-3 text-live"></i>
+        <strong id="statLive" class="mt-0.5 block font-display text-xl font-extrabold leading-none text-live">0</strong>
+        <span class="text-[10px] text-slate-400">En vivo</span>
       </div>
-      <div class="stat-card">
-        <i data-lucide="clock" style="color: var(--gold);"></i>
-        <strong id="statUpcoming" class="num">0</strong>
-        <span class="label">Próximos</span>
+      <div class="rounded-xl border border-line bg-panel px-1 py-1.5 text-center">
+        <i data-lucide="clock" class="mx-auto h-3 w-3 text-gold"></i>
+        <strong id="statUpcoming" class="mt-0.5 block font-display text-xl font-extrabold leading-none">0</strong>
+        <span class="text-[10px] text-slate-400">Próximos</span>
       </div>
-      <div class="stat-card finished">
-        <i data-lucide="check-check" style="color: #34d399;"></i>
-        <strong id="statFinished" class="num">0</strong>
-        <span class="label">Finalizados</span>
-      </div>
-    </div>
-
-    <div id="days" class="days-row" role="tablist" aria-label="Día"></div>
-
-    <div class="chips-wrap">
-      <div id="chips" class="chips" role="group" aria-label="Estado">
-        <button type="button" class="chip" data-status="all">Todos</button>
-        <button type="button" class="chip" data-status="live">En vivo</button>
-        <button type="button" class="chip" data-status="upcoming">Próximos</button>
-        <button type="button" class="chip" data-status="finished">Finalizados</button>
+      <div class="rounded-xl border border-line bg-panel px-1 py-1.5 text-center">
+        <i data-lucide="check-check" class="mx-auto h-3 w-3 text-emerald-400"></i>
+        <strong id="statFinished" class="mt-0.5 block font-display text-xl font-extrabold leading-none text-slate-300">0</strong>
+        <span class="text-[10px] text-slate-400">Finalizados</span>
       </div>
     </div>
 
-    <div id="warning" class="warning hidden"></div>
+    <div id="days" role="tablist" aria-label="Día" class="mb-4 flex gap-2 overflow-x-auto pb-1"></div>
+
+    <div class="mb-6 flex justify-center">
+      <div id="chips" role="group" aria-label="Estado" class="inline-flex rounded-full border border-line bg-panel p-1">
+        <button type="button" data-status="all">Todos</button>
+        <button type="button" data-status="live">En vivo</button>
+        <button type="button" data-status="upcoming">Próximos</button>
+        <button type="button" data-status="finished">Finalizados</button>
+      </div>
+    </div>
+
+    <div id="warning" class="mb-4 hidden rounded-xl border border-gold/50 bg-gold/10 px-3 py-2 text-[13px] text-amber-300"></div>
 
     <div id="content" aria-live="polite"></div>
 
-    <section id="posiciones" class="standings-section" style="scroll-margin-top: 4rem;">
-      <div class="standings-header">
-        <i data-lucide="trophy"></i>
-        <h2>Posiciones</h2>
+    <section id="posiciones" class="mt-4 scroll-mt-16">
+      <div class="mb-4 flex items-center gap-2.5 border-t border-line pt-8">
+        <i data-lucide="trophy" class="h-6 w-6 text-gold"></i>
+        <h2 class="font-display text-3xl font-extrabold uppercase tracking-wider">Posiciones</h2>
       </div>
       <div id="standings"></div>
     </section>
 
-    <footer class="site-footer">
+    <footer class="mt-10 text-center text-[12px] text-slate-400">
       <p>Datos de ESPN · Se actualiza solo (30 s en vivo, 60 s el resto) · Horarios de Argentina (UTC-3)</p>
-      <p id="updatedAt" style="margin-top: .25rem;"></p>
-      <details>
-        <summary>Detalle de fuentes</summary>
-        <ul id="diagList"></ul>
+      <p id="updatedAt" class="mt-1"></p>
+      <details class="mt-3 text-left">
+        <summary class="cursor-pointer text-center">Detalle de fuentes</summary>
+        <ul id="diagList" class="mt-2 list-disc space-y-0.5 pl-5"></ul>
       </details>
     </footer>
   </main>
 
-  <noscript><p style="padding: 1.5rem; text-align: center;">Esta página necesita JavaScript.</p></noscript>
+  <noscript><p class="p-6 text-center">Esta página necesita JavaScript.</p></noscript>
 
   <script>
 /* Deportes Hoy - Horario Argentina
  * Datos: API pública de ESPN (se consulta directo desde el navegador).
  * Fechas siempre en hora de Argentina (America/Argentina/Buenos_Aires).
+ * Estilos: Tailwind (CDN). Íconos: Lucide. Banderas: flagcdn.
  */
 (function () {
   "use strict";
 
   var TZ = "America/Argentina/Buenos_Aires";
   var ESPN = "https://site.api.espn.com/apis/site/v2/sports/";
-  var ESPN_V2 = "https://site.api.espn.com/apis/v2/sports/";
+  var ESPN_V2 = "https://site.api.espn.com/apis/v2/sports/"; // posiciones
 
+  // ---------------------------------------------------------------------------
+  // Filtros de selecciones. Los amistosos (soccer/fifa.friendly) traen a todo el
+  // mundo, así que cada pestaña se queda solo con los equipos de su confederación.
+  // ---------------------------------------------------------------------------
   var SUDAMERICA_RE = /\b(argentina|brazil|brasil|uruguay|chile|colombia|ecuador|peru|per[uú]|paraguay|bolivia|venezuela)\b/i;
   var EUROPA_RE = new RegExp("\\b(" + [
     "england", "scotland", "wales", "northern ireland", "ireland", "france", "germany", "spain", "portugal",
@@ -678,6 +167,9 @@
     "andorra", "san marino", "gibraltar", "liechtenstein"
   ].join("|") + ")\\b", "i");
 
+  // ---------------------------------------------------------------------------
+  // Competencias, en el orden en que aparecen en la página y en el menú.
+  // ---------------------------------------------------------------------------
   var COMPETITIONS = [
     { id: "argentina", flag: "ar", tab: "Liga Argentina", label: "Liga Profesional", color: "#75aadb",
       sources: ["soccer/arg.1", "soccer/arg.copa_lpf"], standings: "soccer/arg.1" },
@@ -695,20 +187,29 @@
       sources: ["soccer/esp.1"], standings: "soccer/esp.1" },
     { id: "seriea", flag: "it", tab: "Serie A", label: "Serie A", color: "#4ade80",
       sources: ["soccer/ita.1"], standings: "soccer/ita.1" },
+
+    // Selecciones sudamericanas: eliminatorias, Copa América y amistosos (solo equipos CONMEBOL).
     { id: "selec-sudamerica", flag: "globe", tab: "Selec. Sudamérica", label: "Selecciones sudamericanas", color: "#38bdf8", lookahead: 60,
       teamFilter: SUDAMERICA_RE,
       sources: ["soccer/fifa.worldq.conmebol", "soccer/conmebol.america", "soccer/fifa.friendly"],
       standings: null, noTable: "Sin tabla de posiciones vigente por ahora: se muestra cuando haya eliminatorias en curso." },
+
+    // Selecciones europeas: Nations League, Eurocopa, eliminatorias UEFA y amistosos (solo equipos UEFA).
     { id: "selec-europa", flag: "eu", tab: "Selec. Europa", label: "Selecciones europeas", color: "#a78bfa", lookahead: 60,
       teamFilter: EUROPA_RE,
       sources: ["soccer/uefa.nations", "soccer/uefa.euro", "soccer/fifa.worldq.uefa", "soccer/fifa.friendly"],
       standings: "soccer/uefa.nations" },
+
     { id: "pumas", flag: "ar", rugby: true, noResults: true, lookahead: 60, tab: "Pumas", label: "Los Pumas", color: "#22d3ee",
       teamFilter: /argentina|pumas/i,
+      // Rugby en ESPN: 17567 = Nations Championship 2026, 289234 = test matches, 244293 = Rugby Championship.
       sources: ["rugby/17567", "rugby/289234", "rugby/244293"], standings: "rugby/17567" }
   ];
   var TABS = ["Todos"].concat(COMPETITIONS.map(function (c) { return c.tab; }));
 
+  // ---------------------------------------------------------------------------
+  // Banderas (flagcdn.com) e íconos (Lucide)
+  // ---------------------------------------------------------------------------
   var FLAG_BASE = "https://flagcdn.com/w40/";
   var COUNTRY_FLAGS = {
     "argentina": "ar", "ireland": "ie", "scotland": "gb-sct", "new zealand": "nz", "wales": "gb-wls",
@@ -727,13 +228,16 @@
   }
   function flagForName(name) { return flagUrl(COUNTRY_FLAGS[String(name || "").toLowerCase().trim()]); }
 
+  // ---------------------------------------------------------------------------
+  // Fechas (siempre en hora Argentina)
+  // ---------------------------------------------------------------------------
   var fmtKey = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
   var fmtTime = new Intl.DateTimeFormat("es-AR", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false });
   var fmtDay = new Intl.DateTimeFormat("es-AR", { timeZone: TZ, weekday: "short", day: "numeric", month: "numeric" });
 
-  function dayKeyOf(date) { return fmtKey.format(date); }
+  function dayKeyOf(date) { return fmtKey.format(date); } // "YYYY-MM-DD" en hora Argentina
   function pad(n) { return String(n).padStart(2, "0"); }
-  function addDays(key, n) {
+  function addDays(key, n) { // aritmética de calendario pura sobre "YYYY-MM-DD"
     var p = key.split("-").map(Number);
     var d = new Date(Date.UTC(p[0], p[1] - 1, p[2] + n));
     return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
@@ -751,6 +255,9 @@
     return cap(fmtDay.format(new Date(Date.UTC(p[0], p[1] - 1, p[2], 12))).replace(".", "").replace(/-/g, "/"));
   }
 
+  // ---------------------------------------------------------------------------
+  // ESPN: partidos
+  // ---------------------------------------------------------------------------
   var cache = new Map();
 
   function fetchJson(url, ttl) {
@@ -775,6 +282,7 @@
   };
   function es(txt) { return STATE_ES[txt] || txt; }
 
+  // Devuelve { status: live|upcoming|finished, detail }
   function parseStatus(st) {
     var type = (st && st.type) || {};
     var name = String(type.name || "").toUpperCase();
@@ -839,6 +347,7 @@
     };
   }
 
+  // ESPN a veces rechaza rangos de fechas (HTTP 400). Si pasa, se pide por día o por mes.
   var rangeSupported = true;
 
   function scoreboard(src, fromKey, toKey, ttl) {
@@ -851,7 +360,7 @@
     function split() {
       var keys = [], k = fromKey, months = {};
       while (k <= toKey) { keys.push(k); months[k.slice(0, 4) + k.slice(5, 7)] = 1; k = addDays(k, 1); }
-      var calls = keys.length <= 4 ? keys.map(compact) : Object.keys(months);
+      var calls = keys.length <= 4 ? keys.map(compact) : Object.keys(months); // pocos días: por día; muchos: por mes (YYYYMM)
       return Promise.all(calls.map(function (d) { return one(d).catch(function () { return null; }); })).then(merge);
     }
     if (fromKey === toKey) return one(compact(fromKey));
@@ -862,7 +371,9 @@
     });
   }
 
+  // Trae una competencia para un rango de días [fromKey, toKey] (inclusive, hora Argentina)
   function loadCompetition(comp, fromKey, toKey, ttl, label) {
+    // ESPN agrupa por día de EE.UU.: pedimos ±1 día y después filtramos por día argentino
     var wf = addDays(fromKey, -1), wt = addDays(toKey, 1);
     var ok = 0, seen = {}, out = [], diag = [];
 
@@ -888,6 +399,9 @@
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // ESPN: posiciones
+  // ---------------------------------------------------------------------------
   var COLS = [
     { k: "PJ", names: ["gamesPlayed"], abbr: ["GP"] },
     { k: "G", names: ["wins"], abbr: ["W"] },
@@ -945,20 +459,23 @@
     return groups;
   }
 
-  var LIVE_TTL = 20000;
-  var SLOW_TTL = 300000;
-  var TABLE_TTL = 600000;
+  // ---------------------------------------------------------------------------
+  // Estado de la app
+  // ---------------------------------------------------------------------------
+  var LIVE_TTL = 20000;   // día elegido: se refresca seguido
+  var SLOW_TTL = 300000;  // resultados anteriores y próximos partidos: cada 5 min
+  var TABLE_TTL = 600000; // posiciones: cada 10 min
 
   var state = {
     tab: "Todos",
     dayKey: todayKey(),
     statusFilter: "all",
     events: [],
-    upcoming: {},
-    results: [],
-    tables: {},
+    upcoming: {},   // id de competencia -> próximos partidos (cuando ese día no hay)
+    results: [],    // partidos finalizados de los últimos 30 días
+    tables: {},     // id de competencia -> { ok, groups } | { error } | { loading } | { none }
     tableDiag: {},
-    closed: {},
+    closed: {},     // posiciones que el usuario cerró
     failedIds: {},
     failed: [],
     diag: [],
@@ -988,7 +505,7 @@
     }));
 
     Promise.all([dayP, resP]).then(function (both) {
-      if (token !== state.token) return;
+      if (token !== state.token) return; // llegó una respuesta vieja
       var events = [], failed = [], failedIds = {}, diag = [], empties = [];
       both[0].forEach(function (r) {
         events = events.concat(r.events);
@@ -1002,6 +519,7 @@
         results = results.concat(r.events.filter(function (e) { return e.status === "finished"; }));
       });
 
+      // Competencias sin partidos ese día: buscamos los próximos
       return Promise.all(empties.map(function (c) {
         return loadCompetition(c, addDays(dayKey, 1), addDays(dayKey, c.lookahead || 21), SLOW_TTL, " (próximos)");
       })).then(function (ups) {
@@ -1014,7 +532,7 @@
         state.results = results; state.upcoming = upcoming;
         state.loaded = true; state.updated = new Date();
         render();
-        if (showSkeleton) replay(document.getElementById("content"));
+        if (showSkeleton) replay($("content"));
         schedule();
       });
     }).catch(function (err) {
@@ -1054,6 +572,9 @@
     }, live ? 30000 : 60000);
   }
 
+  // ---------------------------------------------------------------------------
+  // Render (DOM seguro: todo el texto va por textContent)
+  // ---------------------------------------------------------------------------
   function h(tag, attrs) {
     var el = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
@@ -1069,9 +590,9 @@
   }
   var $ = function (id) { return document.getElementById(id); };
 
-  function icon(name, cls) { return h("i", { "data-lucide": name, class: cls || "" }); }
-  function refreshIcons() { try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch (e) {} }
-  function replay(el) {
+  function icon(name, cls) { return h("i", { "data-lucide": name, class: cls || "h-4 w-4" }); }
+  function refreshIcons() { try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch (e) { /* sin íconos */ } }
+  function replay(el) { // reproduce la animación de entrada (Animate.css)
     if (!el) return;
     el.classList.remove("animate__animated", "animate__fadeInUp", "animate__faster");
     void el.offsetWidth;
@@ -1081,24 +602,33 @@
   function flagImg(comp, cls) {
     var src = flagUrl(comp.flag, comp.color);
     if (!src) return null;
-    var img = h("img", { class: cls || "", src: src, alt: "", loading: "lazy" });
+    var img = h("img", { class: cls || "h-[15px] w-[22px] rounded-[3px] object-cover ring-1 ring-white/20", src: src, alt: "", loading: "lazy" });
     img.addEventListener("error", function () { img.style.visibility = "hidden"; });
     return img;
   }
+
+  var FILTER_ON = "bg-gradient-to-br from-celeste to-[#a9ccee] text-ink border-transparent shadow-lg shadow-celeste/30";
+  var FILTER_OFF = "bg-panel text-slate-100 border-line hover:border-celeste hover:-translate-y-px";
 
   function renderFilters() {
     var nav = $("filters");
     nav.textContent = "";
     TABS.forEach(function (t) {
       var comp = COMPETITIONS.filter(function (c) { return c.tab === t; })[0];
-      var lead = comp ? flagImg(comp) : icon("layout-grid");
-      var b = h("button", { type: "button", class: "filter-btn" + (t === state.tab ? " is-active" : "") }, lead, h("span", { text: t }));
+      var lead = comp ? flagImg(comp) : icon("layout-grid", "h-4 w-4");
+      var b = h("button", {
+        type: "button",
+        class: "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border py-1.5 pl-2.5 pr-3.5 text-[13px] font-semibold transition " + (t === state.tab ? FILTER_ON : FILTER_OFF)
+      }, lead, h("span", { text: t }));
       b.addEventListener("click", function () { setTab(t); });
       nav.appendChild(b);
     });
-    var act = nav.querySelector(".is-active");
-    if (act && act.scrollIntoView) { try { act.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} }
+    var act = nav.querySelector(".from-celeste");
+    if (act && act.scrollIntoView) { try { act.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) { /* viejo */ } }
   }
+
+  var DAY_ON = "bg-gold border-gold text-[#1c1500]";
+  var DAY_OFF = "bg-panel border-line text-slate-100 hover:border-celeste";
 
   function renderDays() {
     var box = $("days");
@@ -1113,9 +643,9 @@
         var sub = Number(p[2]) + "/" + Number(p[1]);
         var named = lab === "Hoy" || lab === "Mañana" || lab === "Ayer";
         var active = key === state.dayKey;
-        var btn = h("button", { type: "button", class: "day-btn" + (active ? " is-active" : "") },
-          h("small", { text: named ? sub : lab.split(" ")[0] }),
-          h("strong", { text: named ? lab : sub })
+        var btn = h("button", { type: "button", class: "min-w-[4.8rem] shrink-0 rounded-xl border px-3 py-1.5 text-center leading-tight transition " + (active ? DAY_ON : DAY_OFF) },
+          h("small", { class: "block text-[11px] " + (active ? "text-[#1c1500]/70" : "text-slate-400"), text: named ? sub : lab.split(" ")[0] }),
+          h("strong", { class: "text-[13px] font-bold", text: named ? lab : sub })
         );
         btn.addEventListener("click", function () { state.dayKey = key; renderDays(); load(true); });
         box.appendChild(btn);
@@ -1123,8 +653,10 @@
     }
   }
 
-  function liveBadge() { return h("span", { class: "badge-live" }, "EN VIVO"); }
-  function note(text) { return h("p", { class: "note", text: text }); }
+  function liveBadge() {
+    return h("span", { class: "inline-flex items-center gap-1 rounded-full bg-live/15 px-2 py-0.5 font-sans text-[11px] font-bold tracking-wider text-live" },
+      h("span", { class: "h-1.5 w-1.5 animate-pulse rounded-full bg-live" }), "EN VIVO");
+  }
 
   function matchRow(e, showDate) {
     var live = e.status === "live", upcoming = e.status === "upcoming", finished = e.status === "finished";
@@ -1133,74 +665,82 @@
     var aWin = finished && (e.away.winner || as > hs);
 
     function teamEl(t, away, win) {
-      var name = h("span", { class: "name", text: t.name });
-      var kids = [];
+      var name = h("span", { class: "truncate " + (win ? "font-extrabold text-white" : "font-semibold text-slate-200"), text: t.name });
+      var kids = [name];
       if (t.logo) {
-        var img = h("img", { src: t.logo, alt: "", loading: "lazy" });
+        var img = h("img", { src: t.logo, alt: "", loading: "lazy", class: "h-7 w-7 shrink-0 object-contain sm:h-8 sm:w-8" });
         img.addEventListener("error", function () {
           if (t.flag && img.src.indexOf(t.flag) === -1) img.src = t.flag;
           else img.style.visibility = "hidden";
         });
         kids = away ? [name, img] : [img, name];
-      } else { kids = [name]; }
-      return h.apply(null, ["div", { class: "team" + (away ? " away" : "") + (win ? " is-winner" : "") }].concat(kids));
+      }
+      return h.apply(null, ["div", { class: "flex min-w-0 items-center gap-2 text-[13px] sm:text-sm " + (away ? "justify-end text-right" : "") }].concat(kids));
     }
 
-    var score = h("div", { class: "score-box" });
+    var score = h("div", { class: "min-w-[4.6rem] text-center" });
     if (upcoming) {
-      score.appendChild(h("span", { class: "score-vs", text: e.detail || "vs" }));
+      score.appendChild(h("span", { class: "text-xs font-semibold uppercase tracking-wide text-slate-400", text: e.detail || "vs" }));
     } else {
       var hv = e.home.score != null && e.home.score !== "" ? e.home.score : "-";
       var av = e.away.score != null && e.away.score !== "" ? e.away.score : "-";
-      score.appendChild(h("span", { class: "score-line", text: hv + " - " + av }));
-      if (e.detail) score.appendChild(h("span", { class: "score-detail", text: e.detail }));
+      score.appendChild(h("span", { class: "block font-display text-[1.7rem] font-extrabold leading-none tabular-nums tracking-wide " + (live ? "text-live" : "text-white"), text: hv + " - " + av }));
+      if (e.detail) score.appendChild(h("span", { class: "mt-1 block text-[11px] " + (live ? "font-bold text-live" : "text-slate-400"), text: e.detail }));
     }
 
-    var meta = h("div", { class: "match-meta" },
-      h("span", { class: "match-time", text: e.time }),
-      showDate ? h("span", { class: "match-date-tag", text: dayLabel(e.dayKey) }) : null,
-      e.venue ? h("span", { class: "match-venue", text: e.venue }) : null
+    // Línea de arriba: hora (y fecha) a la izquierda, estadio a la derecha
+    var meta = h("div", { class: "mb-2 flex items-baseline gap-2" },
+      h("span", { class: "font-display text-xl font-bold leading-none tabular-nums " + (live ? "text-live" : "text-white"), text: e.time }),
+      showDate ? h("span", { class: "text-[12px] font-bold text-gold", text: dayLabel(e.dayKey) }) : null,
+      e.venue ? h("span", { class: "ml-auto min-w-0 truncate text-[11px] text-slate-400", text: e.venue }) : null
     );
 
-    return h("article", { class: "match" + (live ? " is-live" : "") },
-      meta,
-      h("div", { class: "match-body" }, teamEl(e.home, false, hWin), score, teamEl(e.away, true, aWin)));
+    return h("article", {
+      class: "rounded-2xl border px-3 py-2.5 transition hover:border-celeste " +
+        (live ? "border-live/70 bg-gradient-to-r from-live/15 to-panel shadow-lg shadow-live/10" : "border-line bg-panel")
+    }, meta, h("div", { class: "grid grid-cols-[1fr_auto_1fr] items-center gap-2" }, teamEl(e.home, false, hWin), score, teamEl(e.away, true, aWin)));
   }
 
   function sectionTitle(comp, o) {
     o = o || {};
-    var t = h("h2", { class: "section-title", style: "color:" + comp.color },
-      flagImg(comp), h("span", { text: o.title || comp.label }));
+    var t = h("h2", { class: "flex flex-wrap items-center gap-2 font-display text-xl font-bold uppercase tracking-wider sm:text-2xl", style: "color:" + comp.color },
+      flagImg(comp), o.title || comp.label);
     if (o.live) t.appendChild(liveBadge());
-    if (o.count != null) t.appendChild(h("span", { class: "count", text: String(o.count) }));
+    if (o.count != null) t.appendChild(h("span", { class: "font-sans text-sm font-semibold text-slate-400", text: String(o.count) }));
     return t;
   }
 
+  function note(text) {
+    return h("p", { class: "mt-2 rounded-xl border border-dashed border-line bg-panel/50 px-3 py-2 text-sm text-slate-400", text: text });
+  }
+
+  // o: { title, showDate, note, count }
   function daySection(comp, events, o) {
     o = o || {};
-    var sec = h("section", {},
-      sectionTitle(comp, { title: o.title, count: o.count, live: events.some(function (e) { return e.status === "live"; }) }));
+    var sec = h("section", {}, sectionTitle(comp, { title: o.title, count: o.count, live: events.some(function (e) { return e.status === "live"; }) }));
     if (o.note) sec.appendChild(note(o.note));
     if (events.length) {
-      var list = h("div", { class: "matches-list" });
+      var list = h("div", { class: "mt-2.5 space-y-2" });
       events.forEach(function (e) { list.appendChild(matchRow(e, o.showDate)); });
       sec.appendChild(list);
     }
     return sec;
   }
 
+  // Últimos resultados de una competencia (los más recientes primero)
   function resultsBlock(comp) {
     var list = state.results
       .filter(function (e) { return e.comp.id === comp.id && e.dayKey !== state.dayKey; })
       .sort(function (a, b) { return b.ts - a.ts; })
       .slice(0, 5);
 
-    var box = h("section", { class: "results-block" },
-      h("h3", {}, icon("history"), comp.label + " · últimos resultados"));
+    var box = h("section", { class: "mt-6 border-t border-line/60 pt-4" },
+      h("h3", { class: "flex items-center gap-2 font-display text-base font-bold uppercase tracking-wider text-slate-300" },
+        icon("history", "h-4 w-4 shrink-0 text-slate-400"), comp.label + " · últimos resultados"));
     if (!list.length) {
-      box.appendChild(h("p", { class: "results-empty", text: "Sin resultados en los últimos 30 días." }));
+      box.appendChild(h("p", { class: "pt-2 text-sm text-slate-400", text: "Sin resultados en los últimos 30 días." }));
     } else {
-      var wrap = h("div", { class: "matches-list" });
+      var wrap = h("div", { class: "mt-2.5 space-y-2" });
       list.forEach(function (e) { wrap.appendChild(matchRow(e, true)); });
       box.appendChild(wrap);
     }
@@ -1214,11 +754,12 @@
     content.textContent = "";
 
     if (!state.loaded) {
-      for (var i = 0; i < 5; i++) content.appendChild(h("div", { class: "skeleton" }));
+      for (var i = 0; i < 5; i++) content.appendChild(h("div", { class: "mb-2 h-16 animate-pulse rounded-2xl bg-panel" }));
       refreshIcons();
       return;
     }
 
+    // Estadísticas (sobre todos los eventos de la vista)
     var count = { live: 0, upcoming: 0, finished: 0 };
     state.events.forEach(function (e) { count[e.status]++; });
     $("statTotal").textContent = state.events.length;
@@ -1226,6 +767,7 @@
     $("statUpcoming").textContent = count.upcoming;
     $("statFinished").textContent = count.finished;
 
+    // Aviso de ligas que no cargaron
     var w = $("warning");
     if (state.failed.length) {
       w.classList.remove("hidden");
@@ -1239,8 +781,8 @@
 
     if (isRange()) {
       if (!list.length) {
-        content.appendChild(h("div", { class: "empty-state" },
-          h("strong", { text: "No hay partidos de Los Pumas en este período" }),
+        content.appendChild(h("div", { class: "py-12 text-center text-slate-400" },
+          h("strong", { class: "mb-1 block text-slate-100", text: "No hay partidos de Los Pumas en este período" }),
           state.failed.length ? "No se pudo conectar con ESPN. Revisá tu conexión." : "Probá con otro filtro de estado."));
         refreshIcons();
         return;
@@ -1249,7 +791,7 @@
       list.forEach(function (e) { (byDay[e.dayKey] = byDay[e.dayKey] || []).push(e); });
       Object.keys(byDay).sort().forEach(function (k) {
         var evs = byDay[k].sort(byTs);
-        var wrap = h("div", { class: "comp-block" });
+        var wrap = h("div", { class: "mb-7" });
         wrap.appendChild(daySection(evs[0].comp, evs, { title: dayLabel(k) + " · " + evs[0].comp.label }));
         content.appendChild(wrap);
       });
@@ -1257,12 +799,13 @@
       return;
     }
 
+    // Orden fijo: cada competencia con su día y, justo debajo, sus últimos resultados.
     var any = false;
     compsForTab().forEach(function (comp) {
       var evs = list.filter(function (e) { return e.comp.id === comp.id; }).sort(byTs);
-      var wrap = h("div", { class: "comp-block" });
+      var wrap = h("div", { class: "mb-9" });
 
-      if (state.statusFilter !== "all") {
+      if (state.statusFilter !== "all") {      // filtro por estado: solo lo que coincide
         if (!evs.length) return;
         wrap.appendChild(daySection(comp, evs, { count: evs.length }));
         content.appendChild(wrap); any = true;
@@ -1285,8 +828,8 @@
     });
 
     if (!any) {
-      content.appendChild(h("div", { class: "empty-state" },
-        h("strong", { text: "No hay partidos con ese estado" }), "Probá con otro filtro."));
+      content.appendChild(h("div", { class: "py-12 text-center text-slate-400" },
+        h("strong", { class: "mb-1 block text-slate-100", text: "No hay partidos con ese estado" }), "Probá con otro filtro."));
     }
     refreshIcons();
   }
@@ -1295,47 +838,50 @@
     var dl = $("diagList");
     dl.textContent = "";
     state.diag.forEach(function (d) {
-      dl.appendChild(h("li", { class: d.ok ? "" : "error", text: (d.ok ? "OK · " : "Error · ") + d.name + " (" + d.src + "): " + d.text }));
+      dl.appendChild(h("li", { class: d.ok ? "" : "text-red-300", text: (d.ok ? "OK · " : "Error · ") + d.name + " (" + d.src + "): " + d.text }));
     });
     compsForTab().forEach(function (c) {
       var d = state.tableDiag[c.id];
-      if (d) dl.appendChild(h("li", { class: d.ok ? "" : "error", text: (d.ok ? "OK · " : "Error · ") + c.label + " (posiciones " + c.standings + "): " + d.text }));
+      if (d) dl.appendChild(h("li", { class: d.ok ? "" : "text-red-300", text: (d.ok ? "OK · " : "Error · ") + c.label + " (posiciones " + c.standings + "): " + d.text }));
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Posiciones (abajo de todo)
+  // ---------------------------------------------------------------------------
   function standingsTable(group) {
-    var head = h("tr", {},
-      h("th", { class: "col-rank", text: "#" }),
-      h("th", { class: "col-team", text: "Equipo" }));
+    var head = h("tr", { class: "text-[11px] uppercase tracking-wider text-slate-400" },
+      h("th", { class: "w-8 px-1.5 py-2 text-center font-semibold", text: "#" }),
+      h("th", { class: "px-2 py-2 text-left font-semibold", text: "Equipo" }));
     COLS.forEach(function (c) {
-      head.appendChild(h("th", { class: c.wide ? "wide" : "", text: c.k }));
+      head.appendChild(h("th", { class: "px-1.5 py-2 text-center font-semibold sm:px-2 " + (c.wide ? "hidden sm:table-cell" : ""), text: c.k }));
     });
     var tbody = h("tbody");
     var notes = {};
     group.rows.forEach(function (r, i) {
       if (r.note) notes[r.note.text] = r.note.color;
       var color = r.note && r.note.color ? (/^#/.test(r.note.color) ? r.note.color : "#" + r.note.color) : "transparent";
-      var logo = r.logo ? h("img", { src: r.logo, alt: "", loading: "lazy" }) : null;
+      var logo = r.logo ? h("img", { src: r.logo, alt: "", loading: "lazy", class: "h-5 w-5 shrink-0 object-contain" }) : null;
       if (logo) logo.addEventListener("error", function () { logo.style.visibility = "hidden"; });
-      var tr = h("tr", {},
-        h("td", { class: "col-rank", style: "box-shadow: inset 3px 0 0 " + color, text: String(i + 1) }),
-        h("td", { class: "col-team" }, h("div", { class: "team-cell" }, logo, h("span", { text: r.name }))));
+      var tr = h("tr", { class: "border-t border-line/60 hover:bg-panel2/60" },
+        h("td", { class: "px-2 py-2 text-center text-xs font-bold text-slate-300", style: "box-shadow: inset 3px 0 0 " + color, text: String(i + 1) }),
+        h("td", { class: "w-full max-w-0 px-2 py-2" }, h("div", { class: "flex min-w-0 items-center gap-2" }, logo, h("span", { class: "truncate font-semibold text-slate-100", text: r.name }))));
       COLS.forEach(function (c, j) {
-        tr.appendChild(h("td", { class: (c.wide ? "wide " : "") + (c.strong ? "strong" : ""), text: r.cells[j] }));
+        tr.appendChild(h("td", { class: "whitespace-nowrap px-1.5 py-2 text-center sm:px-2 " + (c.wide ? "hidden sm:table-cell " : "") + (c.strong ? "font-extrabold text-white" : "text-slate-300"), text: r.cells[j] }));
       });
       tbody.appendChild(tr);
     });
 
-    var table = h("table", { class: "standings-table" }, h("thead", {}, head), tbody);
-    var wrap = h("div", { class: "standings-table-wrap" }, table);
+    var table = h("table", { class: "w-full text-sm tabular-nums" }, h("thead", {}, head), tbody);
+    var wrap = h("div", { class: "overflow-x-auto" }, table);
 
     var legend = Object.keys(notes);
     var out = h("div", {}, wrap);
     if (legend.length) {
-      var lg = h("ul", { class: "standings-legend" });
+      var lg = h("ul", { class: "flex flex-wrap gap-x-4 gap-y-1 border-t border-line/60 px-3 py-2 text-[11px] text-slate-400" });
       legend.forEach(function (txt) {
         var col = notes[txt] ? (/^#/.test(notes[txt]) ? notes[txt] : "#" + notes[txt]) : "#64748b";
-        lg.appendChild(h("li", {}, h("span", { class: "dot", style: "background:" + col }), txt));
+        lg.appendChild(h("li", { class: "flex items-center gap-1.5" }, h("span", { class: "h-2.5 w-2.5 rounded-full", style: "background:" + col }), txt));
       });
       out.appendChild(lg);
     }
@@ -1347,28 +893,28 @@
     box.textContent = "";
     compsForTab().forEach(function (c) {
       var t = state.tables[c.id] || { loading: true };
-      var det = h("details", { class: "standings-card", "data-comp": c.id });
+      var det = h("details", { class: "group mb-4 overflow-hidden rounded-2xl border border-line bg-panel/60", "data-comp": c.id });
       if (!state.closed[c.id]) det.setAttribute("open", "");
       det.addEventListener("toggle", function () { state.closed[c.id] = !det.open; });
 
-      det.appendChild(h("summary", {},
+      det.appendChild(h("summary", { class: "flex cursor-pointer list-none items-center gap-2.5 px-4 py-3 [&::-webkit-details-marker]:hidden" },
         flagImg(c),
-        h("span", { class: "comp-name", style: "color:" + c.color, text: c.label }),
-        h("span", { class: "chev" }, icon("chevron-down"))));
+        h("span", { class: "font-display text-lg font-bold uppercase tracking-wider", style: "color:" + c.color, text: c.label }),
+        h("span", { class: "ml-auto text-slate-400 transition-transform group-open:rotate-180" }, icon("chevron-down", "h-5 w-5"))));
 
-      var body = h("div", { class: "standings-body" });
+      var body = h("div", { class: "border-t border-line/60" });
       if (t.none) {
-        body.appendChild(h("p", { class: "standings-msg", text: c.noTable || "Sin tabla de posiciones." }));
+        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: c.noTable || "Sin tabla de posiciones." }));
       } else if (t.loading) {
-        for (var i = 0; i < 4; i++) body.appendChild(h("div", { class: "skeleton", style: "margin: .75rem; height: 1.25rem;" }));
+        for (var i = 0; i < 4; i++) body.appendChild(h("div", { class: "m-3 h-5 animate-pulse rounded bg-panel2" }));
       } else if (t.error) {
-        body.appendChild(h("p", { class: "standings-msg", text: "No se pudo cargar la tabla (" + t.error + "). Se reintenta al recargar." }));
+        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: "No se pudo cargar la tabla (" + t.error + "). Se reintenta al recargar." }));
       } else if (!t.groups.length) {
-        body.appendChild(h("p", { class: "standings-msg", text: "Sin tabla disponible por ahora (puede ser una fase de eliminación directa)." }));
+        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: "Sin tabla disponible por ahora (puede ser una fase de eliminación directa)." }));
       } else {
-        t.groups.forEach(function (g) {
+        t.groups.forEach(function (g, gi) {
           if (g.name && (t.groups.length > 1 || !/^(standings|table)$/i.test(g.name))) {
-            body.appendChild(h("h4", { class: "group-title", text: g.name.replace(/^Group /i, "Grupo ") }));
+            body.appendChild(h("h4", { class: "bg-panel2/50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-slate-300", text: g.name.replace(/^Group /i, "Grupo ") }));
           }
           body.appendChild(standingsTable(g));
         });
@@ -1379,9 +925,15 @@
     refreshIcons();
   }
 
+  // ---------------------------------------------------------------------------
+  // Interacción
+  // ---------------------------------------------------------------------------
+  var CHIP_ON = "bg-celeste text-ink";
+  var CHIP_OFF = "text-slate-300 hover:text-white";
+
   function paintChips() {
     document.querySelectorAll("[data-status]").forEach(function (c) {
-      c.classList.toggle("is-active", c.dataset.status === state.statusFilter);
+      c.className = "rounded-full px-3.5 py-1.5 text-xs font-bold transition " + (c.dataset.status === state.statusFilter ? CHIP_ON : CHIP_OFF);
     });
   }
 
@@ -1389,7 +941,7 @@
     state.tab = t;
     state.statusFilter = "all";
     paintChips();
-    try { history.replaceState(null, "", "#" + encodeURIComponent(t.toLowerCase())); } catch (e) {}
+    try { history.replaceState(null, "", "#" + encodeURIComponent(t.toLowerCase())); } catch (e) { /* file:// */ }
     renderDays();
     load(true);
     loadTables();
@@ -1430,6 +982,7 @@
 
   init();
 })();
+
   </script>
 </body>
 </html>
