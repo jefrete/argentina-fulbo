@@ -499,21 +499,86 @@
   // ---------------------------------------------------------------------------
   // ESPN: partidos
   // ---------------------------------------------------------------------------
-  var cache = new Map();
+  // Estrategia anti-errores (3 capas):
+  //  1) Timeout con AbortController (8 s por intento).
+  //  2) Reintentos automáticos con espera creciente, solo ante fallas pasajeras
+  //     (red caída, timeout, 408/429/5xx). Los errores 4xx NO se reintentan.
+  //  3) Respaldo en localStorage: si todo falla, se muestra la última respuesta guardada.
+  var TIMEOUT_MS = 8000;
+  var RETRIES = 2;                                   // 1 intento + 2 reintentos
+  var RETRY_DELAY = 1000;                            // 1 s, después 2 s
+  var RETRY_ON = [408, 429, 500, 502, 503, 504];
+  var STALE_MAX = 6 * 3600 * 1000;                   // el respaldo sirve hasta 6 horas
+  var FAIL_TTL = 30 * 60 * 1000;                     // un 4xx (ej. liga inexistente) no se vuelve a pedir por 30 min
+  var STORE_PREFIX = "dh:";
+  var MAX_STORE_CHARS = 400000;
+
+  var cache = new Map();      // respuestas buenas en memoria
+  var failCache = new Map();  // errores 4xx recordados (evita llenar la consola de rojo)
+  var usedStale = false;      // true si en esta carga se mostraron datos guardados
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function readStore(url) {
+    try {
+      var raw = localStorage.getItem(STORE_PREFIX + url);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function writeStore(url, data) {
+    try {
+      var str = JSON.stringify({ t: Date.now(), data: data });
+      if (str.length > MAX_STORE_CHARS) return;
+      localStorage.setItem(STORE_PREFIX + url, str);
+    } catch (e) { // sin espacio o bloqueado: limpiamos lo nuestro y seguimos sin respaldo
+      try {
+        Object.keys(localStorage).forEach(function (k) { if (k.indexOf(STORE_PREFIX) === 0) localStorage.removeItem(k); });
+      } catch (e2) { /* nada */ }
+    }
+  }
+
+  function attempt(url) {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
+    return fetch(url, { signal: ctrl.signal, headers: { Accept: "application/json" } })
+      .then(function (res) {
+        if (!res.ok) { var err = new Error("HTTP " + res.status); err.status = res.status; throw err; }
+        return res.json();
+      })
+      .finally(function () { clearTimeout(timer); });
+  }
+
+  function withRetry(url, left) {
+    return attempt(url).catch(function (err) {
+      var transient = !err.status || RETRY_ON.indexOf(err.status) > -1; // sin status = red/timeout
+      if (left <= 0 || !transient) throw err;
+      return sleep(RETRY_DELAY * (RETRIES - left + 1)).then(function () { return withRetry(url, left - 1); });
+    });
+  }
 
   function fetchJson(url, ttl) {
     var hit = cache.get(url);
     if (hit && Date.now() - hit.t < ttl) return Promise.resolve(hit.data);
 
-    var ctrl = new AbortController();
-    var timer = setTimeout(function () { ctrl.abort(); }, 12000);
-    return fetch(url, { signal: ctrl.signal, headers: { Accept: "application/json" } })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
+    var bad = failCache.get(url);
+    if (bad && Date.now() - bad.t < FAIL_TTL) return Promise.reject(bad.err);
+
+    return withRetry(url, RETRIES)
+      .then(function (data) {
+        cache.set(url, { t: Date.now(), data: data });
+        writeStore(url, data);
+        return data;
       })
-      .then(function (data) { cache.set(url, { t: Date.now(), data: data }); return data; })
-      .finally(function () { clearTimeout(timer); });
+      .catch(function (err) {
+        var permanent = err.status && RETRY_ON.indexOf(err.status) === -1; // 400, 404, etc.
+        if (permanent) { failCache.set(url, { t: Date.now(), err: err }); throw err; }
+        var saved = readStore(url);                                         // falla pasajera: respaldo
+        if (saved && Date.now() - saved.t < STALE_MAX) {
+          usedStale = true;
+          return saved.data;
+        }
+        throw err;
+      });
   }
 
   var STATE_ES = {
@@ -734,6 +799,7 @@
 
   function load(showSkeleton) {
     var token = ++state.token;
+    usedStale = false;
     if (showSkeleton) { state.loaded = false; render(); }
 
     var today = todayKey(), dayKey = state.dayKey, range = isRange(), comps = compsForTab();
@@ -778,7 +844,7 @@
       });
     }).catch(function (err) {
       if (token !== state.token) return;
-      if (window.console) console.error(err);
+      if (window.console) console.warn("No se pudieron cargar los partidos:", err && err.message);
       state.loaded = true; state.failed = comps.map(function (c) { return c.label; });
       render();
     });
@@ -1000,7 +1066,7 @@
     } else { w.classList.add("hidden"); }
 
     renderDiag();
-    $("updatedAt").textContent = state.updated ? "Última actualización: " + fmtTime.format(state.updated) : "";
+    $("updatedAt").textContent = state.updated ? "Última actualización: " + fmtTime.format(state.updated) + (usedStale ? " · algunos datos son de la última vez que hubo conexión" : "") : "";
 
     var list = state.events.filter(function (e) { return state.statusFilter === "all" || e.status === state.statusFilter; });
 
